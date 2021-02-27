@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('https://op30132.github.io').hostname,
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.7.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    comments: {"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: '',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}
+  };
+</script>
+
+  <meta name="description" content="token使用 postman 測 api 常常需要先取得 token 再送 request，因此遠古的做法就是先送完 token 的 request，取得 response 再複製貼上">
+<meta property="og:type" content="article">
+<meta property="og:title" content="實用 Postman 技巧:  pre-script + test 一鍵判斷 API 是否可用">
+<meta property="og:url" content="https://op30132.github.io/2020/03/17/postman-script/index.html">
+<meta property="og:site_name" content="Winnie&#39;s blog">
+<meta property="og:description" content="token使用 postman 測 api 常常需要先取得 token 再送 request，因此遠古的做法就是先送完 token 的 request，取得 response 再複製貼上">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://i.imgur.com/0zrPx1Z.png">
+<meta property="og:image" content="https://i.imgur.com/uAAqXAD.png">
+<meta property="og:image" content="https://i.imgur.com/eKhGETR.png">
+<meta property="og:image" content="https://i.imgur.com/maOJh6k.png">
+<meta property="og:image" content="https://i.imgur.com/nHmqguV.png">
+<meta property="og:image" content="https://i.imgur.com/q0wBonB.png">
+<meta property="og:image" content="https://i.imgur.com/ioTci57.png">
+<meta property="og:image" content="https://i.imgur.com/oyUkLav.png">
+<meta property="og:image" content="https://i.imgur.com/CJVOfi3.png">
+<meta property="og:image" content="https://i.imgur.com/jkapK80.png">
+<meta property="og:image" content="https://i.imgur.com/LD5wKkr.png">
+<meta property="og:image" content="https://i.imgur.com/WdAT9HC.png">
+<meta property="og:image" content="https://i.imgur.com/jje88TB.png">
+<meta property="og:image" content="https://i.imgur.com/Sw07tYW.png">
+<meta property="og:image" content="https://i.imgur.com/lH0HaHN.png">
+<meta property="article:published_time" content="2020-03-17T11:14:53.000Z">
+<meta property="article:modified_time" content="2021-02-27T05:35:07.632Z">
+<meta property="article:author" content="Winnie">
+<meta property="article:tag" content="postman">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.imgur.com/0zrPx1Z.png">
+
+<link rel="canonical" href="https://op30132.github.io/2020/03/17/postman-script/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true
+  };
+</script>
+
+  <title>實用 Postman 技巧:  pre-script + test 一鍵判斷 API 是否可用 | Winnie's blog</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-154744757-1"></script>
+    <script>
+      if (CONFIG.hostname === location.hostname) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-154744757-1');
+      }
+    </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Winnie's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首頁</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>關於</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>標籤</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分類</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>歸檔</a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://op30132.github.io/2020/03/17/postman-script/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Winnie">
+      <meta itemprop="description" content="API 調用師">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Winnie's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          實用 Postman 技巧:  pre-script + test 一鍵判斷 API 是否可用
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">發表於</span>
+
+              <time title="創建時間：2020-03-17 11:14:53" itemprop="dateCreated datePublished" datetime="2020-03-17T11:14:53+00:00">2020-03-17</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新於</span>
+                <time title="修改時間：2021-02-27 05:35:07" itemprop="dateModified" datetime="2021-02-27T05:35:07+00:00">2021-02-27</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分類於</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/postman/" itemprop="url" rel="index">
+                    <span itemprop="name">postman</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="token"><a href="#token" class="headerlink" title="token"></a>token</h2><p>使用 postman 測 api 常常需要先取得 token 再送 request，因此遠古的做法就是先送完 token 的 request，取得 response 再複製貼上</p>
+<a id="more"></a>
+<p>那 postman 提供了很好的工具可以節省這些麻煩，好好利用就可以省下不少時間</p>
+<h2 id="1-準備-environment"><a href="#1-準備-environment" class="headerlink" title="1. 準備 environment"></a>1. 準備 environment</h2><p>首先點開右上角設置環境<br><img src="https://i.imgur.com/0zrPx1Z.png" alt=""></p>
+<p>點選 add 新增 environment，也可以選擇 gobal 環境，若真的需要的話，所有的 collection 就會有相同的環境</p>
+<p>接著設置有需要用到的變數</p>
+<p><img src="https://i.imgur.com/uAAqXAD.png" alt=""></p>
+<p>點選新增，環境變數就準備好了</p>
+<h2 id="2-設置-pre-script"><a href="#2-設置-pre-script" class="headerlink" title="2. 設置 pre-script"></a>2. 設置 pre-script</h2><h4 id="1-到-collection-下，點選-edit"><a href="#1-到-collection-下，點選-edit" class="headerlink" title="1. 到 collection 下，點選 edit"></a>1. 到 collection 下，點選 edit</h4><p><img src="https://i.imgur.com/eKhGETR.png" alt=""></p>
+<h4 id="2-設置-authorization"><a href="#2-設置-authorization" class="headerlink" title="2. 設置 authorization"></a>2. 設置 authorization</h4><p><img src="https://i.imgur.com/maOJh6k.png" alt=""></p>
+<h4 id="3-設置-Pre-request-Scripts"><a href="#3-設置-Pre-request-Scripts" class="headerlink" title="3. 設置 Pre-request Scripts"></a>3. 設置 Pre-request Scripts</h4><p><img src="https://i.imgur.com/nHmqguV.png" alt=""></p>
+<h3 id="x-www-form-urlencoded-格式"><a href="#x-www-form-urlencoded-格式" class="headerlink" title="x-www-form-urlencoded 格式"></a>x-www-form-urlencoded 格式</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">pm.sendRequest(&#123;</span><br><span class="line">    url: pm.environment.get(<span class="string">"BASE_URL"</span>) + <span class="string">"authentication"</span>,</span><br><span class="line">    method: <span class="string">"POST"</span>,</span><br><span class="line">    header: &#123; </span><br><span class="line">        <span class="string">"content-type"</span> : <span class="string">"x-www-form-urlencoded"</span> </span><br><span class="line">    &#125;,</span><br><span class="line">    body: &#123;</span><br><span class="line">        mode: <span class="string">"urlencoded"</span>,</span><br><span class="line">        urlencoded: [</span><br><span class="line">            &#123;<span class="attr">key</span>: <span class="string">"account"</span>, <span class="attr">value</span>: <span class="string">"sysadmin"</span>&#125;,</span><br><span class="line">            &#123;<span class="attr">key</span>: <span class="string">"password"</span>, <span class="attr">value</span>: <span class="string">"sysadmin"</span>&#125;</span><br><span class="line">        ]</span><br><span class="line">    &#125;</span><br><span class="line">&#125;,  (err, res) =&gt; &#123;</span><br><span class="line">    pm.environment.set(<span class="string">"AUTH_TOKEN"</span>, res.json().authToken);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<h3 id="json-格式"><a href="#json-格式" class="headerlink" title="json 格式"></a>json 格式</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">pm.sendRequest(&#123;</span><br><span class="line">    url: pm.environment.get(<span class="string">"BASE_URL"</span>) + <span class="string">"authentication"</span>,</span><br><span class="line">    method: <span class="string">"POST"</span>,</span><br><span class="line">    header: &#123;</span><br><span class="line">        <span class="string">"content-type"</span>: <span class="string">"application/json"</span>,</span><br><span class="line">    &#125;,</span><br><span class="line">    body: &#123;</span><br><span class="line">        mode: <span class="string">"raw"</span>,</span><br><span class="line">        raw: <span class="built_in">JSON</span>.stringify(&#123;</span><br><span class="line">            account: <span class="string">"sysadmin"</span>,</span><br><span class="line">            password: <span class="string">"sysadmin"</span> </span><br><span class="line">        &#125;)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;, (err, res) =&gt; &#123;</span><br><span class="line">    pm.environment.set(<span class="string">"AUTH_TOKEN"</span>, res.json().authToken);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<h3 id="formdata-格式"><a href="#formdata-格式" class="headerlink" title="formdata 格式"></a>formdata 格式</h3><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">pm.sendRequest(&#123;</span><br><span class="line">    url: pm.environment.get(<span class="string">"BASE_URL"</span>) + <span class="string">"authentication"</span>,</span><br><span class="line">    method: <span class="string">"POST"</span>,</span><br><span class="line">    body: &#123;</span><br><span class="line">      mode: <span class="string">"formdata"</span>,</span><br><span class="line">      formdata: [</span><br><span class="line">        &#123;<span class="attr">key</span>: <span class="string">"account"</span>, <span class="attr">value</span>: <span class="string">"sysadmin"</span>&#125;,</span><br><span class="line">        &#123;<span class="attr">key</span>: <span class="string">"password"</span>, <span class="attr">value</span>: <span class="string">"sysadmin"</span>&#125;,</span><br><span class="line">      ]</span><br><span class="line">    &#125;</span><br><span class="line">&#125;, (err, res) =&gt; &#123;</span><br><span class="line">    pm.environment.set(<span class="string">"AUTH_TOKEN"</span>, res.json().authToken)</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<h4 id="4-設置-collection-下的-API"><a href="#4-設置-collection-下的-API" class="headerlink" title="4. 設置 collection 下的 API"></a>4. 設置 collection 下的 API</h4><p>最後只要新增 API 在 collection 下，確認 authorization 是繼承至上層就行了(一般為默認選項)<br><img src="https://i.imgur.com/q0wBonB.png" alt=""></p>
+<h2 id="3-對-API-進行測試"><a href="#3-對-API-進行測試" class="headerlink" title="3. 對 API 進行測試"></a>3. 對 API 進行測試</h2><p>若要對 collection 下的 API 做同樣的測試，我們可以利用 test 來快速進行</p>
+<p><img src="https://i.imgur.com/ioTci57.png" alt=""></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> response = pm.response.json();</span><br><span class="line">pm.test(<span class="string">"API Status code 200"</span>, () =&gt; &#123;</span><br><span class="line">    pm.response.to.have.status(<span class="number">200</span>);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<p>這裡可以放一些共用測試，一般測試回傳 status 是否為 200，有其他需要可自行添加</p>
+<p>若想對個別 API 進行測試，可以直接寫在 API 的 Tests 下<br><img src="https://i.imgur.com/oyUkLav.png" alt=""></p>
+<p>送出 request 後測試結果顯示在下方<br><img src="https://i.imgur.com/CJVOfi3.png" alt=""></p>
+<h3 id="對所有-API-進行測試"><a href="#對所有-API-進行測試" class="headerlink" title="對所有 API 進行測試"></a>對所有 API 進行測試</h3><p>若手上有大量 api 想測試，又不想一個一個點選，那我們可以使用 collection runner 來對大量 API 進行快速測試</p>
+<h4 id="1-開啟-collection-runner"><a href="#1-開啟-collection-runner" class="headerlink" title="1. 開啟 collection runner"></a>1. 開啟 collection runner</h4><p>先到 collection 點選 run，也可以從上方 Runner 開啟<br><img src="https://i.imgur.com/jkapK80.png" alt=""><br><img src="https://i.imgur.com/LD5wKkr.png" alt=""></p>
+<h4 id="2-跑測試"><a href="#2-跑測試" class="headerlink" title="2. 跑測試"></a>2. 跑測試</h4><p>設置好 environment 就可以 run，要保留回傳結果的可以勾選 save response<br><img src="https://i.imgur.com/WdAT9HC.png" alt=""></p>
+<h4 id="3-測試結果"><a href="#3-測試結果" class="headerlink" title="3. 測試結果"></a>3. 測試結果</h4><p>測試結果一目瞭然，由於 API 會更改資料庫，可以結合 collection 變數新增完資料接刪除 api，就可以快速對專案下的 API 進行測試喔<br><img src="https://i.imgur.com/jje88TB.png" alt=""></p>
+<h2 id="優化-減少-request-次數"><a href="#優化-減少-request-次數" class="headerlink" title="優化: 減少 request 次數"></a>優化: 減少 request 次數</h2><p>雖然現在已經可以一鍵測 API 了，但從 Postman Console 可以看到每次都有兩個 request 送出</p>
+<p><img src="https://i.imgur.com/Sw07tYW.png" alt=""></p>
+<blockquote>
+<p>Postman Console: ctrl + alt + c / command + alt + c 呼叫</p>
+</blockquote>
+<p>那要如何解決呢?</p>
+<p>我們可以在 environment 中，新增 token expire 欄位(預設值 0)，並將 pre-scripts 修改成如果還沒到期，就不送取得 token 的 request</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (pm.environment.get(<span class="string">'TOKEN_EXPIRY'</span>) &lt;= <span class="keyword">new</span> <span class="built_in">Date</span>().getTime()) &#123;</span><br><span class="line">    pm.sendRequest(&#123;</span><br><span class="line">        url: pm.environment.get(<span class="string">"BASE_URL"</span>) + <span class="string">'/authentication'</span>,</span><br><span class="line">        method: <span class="string">'POST'</span>,</span><br><span class="line">        header: &#123; </span><br><span class="line">            <span class="string">'content-type'</span> : <span class="string">'x-www-form-urlencoded'</span> </span><br><span class="line">        &#125;,</span><br><span class="line">        body: &#123;</span><br><span class="line">            mode: <span class="string">'urlencoded'</span>,</span><br><span class="line">            urlencoded: [</span><br><span class="line">                &#123;<span class="attr">key</span>: <span class="string">"account"</span>, <span class="attr">value</span>: <span class="string">"sysadmin"</span>&#125;,</span><br><span class="line">                &#123;<span class="attr">key</span>: <span class="string">"password"</span>, <span class="attr">value</span>: <span class="string">"sysadmin"</span>&#125;</span><br><span class="line">            ]</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;,  (err, res) =&gt; &#123;</span><br><span class="line">        <span class="keyword">const</span> responseJson = res.json();</span><br><span class="line">        pm.environment.set(<span class="string">"AUTH_TOKEN"</span>, responseJson.authToken);</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">const</span> expiryDate = <span class="keyword">new</span> <span class="built_in">Date</span>();</span><br><span class="line">        expiryDate.setSeconds(expiryDate.getSeconds() + responseJson.expires);</span><br><span class="line">        pm.environment.set(<span class="string">'TOKEN_EXPIRY'</span>, expiryDate.getTime());</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>可以看到修改完只會送出一個 request<br><img src="https://i.imgur.com/lH0HaHN.png" alt=""></p>
+<h2 id="BONUS-切換不同帳號測-API"><a href="#BONUS-切換不同帳號測-API" class="headerlink" title="BONUS: 切換不同帳號測 API"></a>BONUS: 切換不同帳號測 API</h2><p>有時候想測試不同帳號時 API 的回傳結果，這時也是同樣 environment + pre-script 思路</p>
+<ol>
+<li>在 environment 中新增 ACCOUNT 及 PASSWORD 欄位</li>
+<li>在 pre-script 中將寫死的帳密改成 <code>pm.environment.get(&#39;ACCOUNT&#39;)</code> 及 <code>pm.environment.get(&#39;PASSWORD&#39;)</code></li>
+<li>複製一個新的 environment，設定 ACCOUNT 和 PASSWORD 為另一組帳密</li>
+</ol>
+<p>這樣只要直接切換 environment，就可以切換帳號測 API 了</p>
+<h2 id="結語"><a href="#結語" class="headerlink" title="結語"></a>結語</h2><p>之後只要有新的 API，加到 collection 就可以直接送出啦</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/postman/" rel="tag"># postman</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/02/05/github-action/" rel="prev" title="Hexo + github actions 自動化部署">
+      <i class="fa fa-chevron-left"></i> Hexo + github actions 自動化部署
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/04/20/cs50/" rel="next" title="[課程推薦] CS50 開啟你的計算機大門之超推薦心得!!">
+      [課程推薦] CS50 開啟你的計算機大門之超推薦心得!! <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#token"><span class="nav-number">1.</span> <span class="nav-text">token</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-準備-environment"><span class="nav-number">2.</span> <span class="nav-text">1. 準備 environment</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-設置-pre-script"><span class="nav-number">3.</span> <span class="nav-text">2. 設置 pre-script</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-到-collection-下，點選-edit"><span class="nav-number">3.0.1.</span> <span class="nav-text">1. 到 collection 下，點選 edit</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-設置-authorization"><span class="nav-number">3.0.2.</span> <span class="nav-text">2. 設置 authorization</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-設置-Pre-request-Scripts"><span class="nav-number">3.0.3.</span> <span class="nav-text">3. 設置 Pre-request Scripts</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#x-www-form-urlencoded-格式"><span class="nav-number">3.1.</span> <span class="nav-text">x-www-form-urlencoded 格式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#json-格式"><span class="nav-number">3.2.</span> <span class="nav-text">json 格式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#formdata-格式"><span class="nav-number">3.3.</span> <span class="nav-text">formdata 格式</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#4-設置-collection-下的-API"><span class="nav-number">3.3.1.</span> <span class="nav-text">4. 設置 collection 下的 API</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-對-API-進行測試"><span class="nav-number">4.</span> <span class="nav-text">3. 對 API 進行測試</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#對所有-API-進行測試"><span class="nav-number">4.1.</span> <span class="nav-text">對所有 API 進行測試</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-開啟-collection-runner"><span class="nav-number">4.1.1.</span> <span class="nav-text">1. 開啟 collection runner</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-跑測試"><span class="nav-number">4.1.2.</span> <span class="nav-text">2. 跑測試</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-測試結果"><span class="nav-number">4.1.3.</span> <span class="nav-text">3. 測試結果</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#優化-減少-request-次數"><span class="nav-number">5.</span> <span class="nav-text">優化: 減少 request 次數</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#BONUS-切換不同帳號測-API"><span class="nav-number">6.</span> <span class="nav-text">BONUS: 切換不同帳號測 API</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#結語"><span class="nav-number">7.</span> <span class="nav-text">結語</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Winnie</p>
+  <div class="site-description" itemprop="description">API 調用師</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">16</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Winnie</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 強力驅動 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主題 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.7.0
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID: '4d04e480bbb2fbe2bbd6',
+      clientSecret: '3b14c84be0e27c5f25748fd158c25581c827f1b4',
+      repo: 'op30132.github.io',
+      owner: 'op30132',
+      admin: ['op30132'],
+      id: '330b51dda4c893f8da14f580c7f0e250',
+        language: 'zh-TW',
+      distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+</body>
+</html>

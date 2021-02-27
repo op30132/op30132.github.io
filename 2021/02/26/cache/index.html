@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('https://op30132.github.io').hostname,
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.7.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    comments: {"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: '',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}
+  };
+</script>
+
+  <meta name="description" content="cache 功用相同的資料不用重新抓，省時省流量 cache 設定">
+<meta property="og:type" content="article">
+<meta property="og:title" content="cache 概念整理">
+<meta property="og:url" content="https://op30132.github.io/2021/02/26/cache/index.html">
+<meta property="og:site_name" content="Winnie&#39;s blog">
+<meta property="og:description" content="cache 功用相同的資料不用重新抓，省時省流量 cache 設定">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://i.imgur.com/EVMx0Wu.png">
+<meta property="article:published_time" content="2021-02-26T12:30:00.000Z">
+<meta property="article:modified_time" content="2021-02-27T05:35:07.632Z">
+<meta property="article:author" content="Winnie">
+<meta property="article:tag" content="cache">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.imgur.com/EVMx0Wu.png">
+
+<link rel="canonical" href="https://op30132.github.io/2021/02/26/cache/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true
+  };
+</script>
+
+  <title>cache 概念整理 | Winnie's blog</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-154744757-1"></script>
+    <script>
+      if (CONFIG.hostname === location.hostname) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-154744757-1');
+      }
+    </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Winnie's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首頁</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>關於</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>標籤</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分類</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>歸檔</a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://op30132.github.io/2021/02/26/cache/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Winnie">
+      <meta itemprop="description" content="API 調用師">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Winnie's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          cache 概念整理
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">發表於</span>
+
+              <time title="創建時間：2021-02-26 12:30:00" itemprop="dateCreated datePublished" datetime="2021-02-26T12:30:00+00:00">2021-02-26</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新於</span>
+                <time title="修改時間：2021-02-27 05:35:07" itemprop="dateModified" datetime="2021-02-27T05:35:07+00:00">2021-02-27</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分類於</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/concept/" itemprop="url" rel="index">
+                    <span itemprop="name">concept</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="cache-功用"><a href="#cache-功用" class="headerlink" title="cache 功用"></a>cache 功用</h2><p>相同的資料不用重新抓，省時省流量</p>
+<h2 id="cache-設定"><a href="#cache-設定" class="headerlink" title="cache 設定"></a>cache 設定</h2><a id="more"></a>
+<table>
+<thead>
+<tr>
+<th>Stop using (HTTP 1.0)</th>
+<th>Replaced with (HTTP 1.1 since 1999)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Expires: [date]</td>
+<td>Cache-Control: max-age=[seconds]</td>
+</tr>
+<tr>
+<td>Pragma: no-cache</td>
+<td>Cache-Control: no-cache</td>
+</tr>
+</tbody></table>
+<h3 id="http-1-0-的快取方式"><a href="#http-1-0-的快取方式" class="headerlink" title="http 1.0 的快取方式"></a>http 1.0 的快取方式</h3><ul>
+<li>Pragma</li>
+<li>Expires</li>
+</ul>
+<p>為了兼容，大部分網站還是會放</p>
+<h4 id="Pragma-禁用快取"><a href="#Pragma-禁用快取" class="headerlink" title="Pragma: 禁用快取"></a>Pragma: 禁用快取</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F; 直接放在 meta 標籤中</span><br><span class="line">&lt;meta http-equiv&#x3D;&quot;Pragma&quot; content&#x3D;&quot;no-cache&quot;&gt;</span><br><span class="line">&#x2F;&#x2F; 放在 response header</span><br><span class="line">Pragma: no-cache</span><br></pre></td></tr></table></figure>
+<p>no-cache: 告訴客戶端不要對該資源快取</p>
+<p>但受限於僅 IE 可用、僅限頁面而頁面上資源不受影響，基本上沒什麼用</p>
+<blockquote>
+<p>與 Cache-Control: no-cache 功能一樣</p>
+</blockquote>
+<h4 id="Expires-啟用快取並設定快取時間"><a href="#Expires-啟用快取並設定快取時間" class="headerlink" title="Expires: 啟用快取並設定快取時間"></a>Expires: 啟用快取並設定快取時間</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;meta http-equiv&#x3D;&quot;expires&quot; content&#x3D;&quot;mon, 18 apr 2016 14:30:00 GMT&quot;&gt;</span><br><span class="line">...</span><br><span class="line">Expires: Fri, 11 Jun 2021 11:33:01 GMT</span><br></pre></td></tr></table></figure>
+
+<p>若 Pragma 和 Expires 同時出現，則 pragma 優先級更高</p>
+<h3 id="http-1-1-新增-Cache-Control"><a href="#http-1-1-新增-Cache-Control" class="headerlink" title="http 1.1 新增 Cache-Control"></a>http 1.1 新增 Cache-Control</h3><p>由於 expire 無法保證 client 端時間和 server 端時間統一，http 1.1 新增 Cache-Control</p>
+<p>若同時出現 Pragma、Expires 和 Cache-Control，Cache-Control 優先級更高</p>
+<p>此部份分成三種快取方案</p>
+<ol>
+<li>資源是否要快取</li>
+<li>快取多久</li>
+<li>到期後如何判斷是否過期</li>
+</ol>
+<h3 id="資源是否要快取"><a href="#資源是否要快取" class="headerlink" title="資源是否要快取"></a>資源是否要快取</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cache-Control: no-store&#x2F;no-cache</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p>no-store: 每次都去 server 要新資料，不存任何快取</p>
+</li>
+<li><p>no-cache: 快取需存取，但每次都去 server 檢查快取</p>
+</li>
+<li><p>沒有提供: 都存</p>
+</li>
+<li><p>private: 只有 client 可以存快取，proxy 不行</p>
+</li>
+<li><p>public: 大家都可以存</p>
+</li>
+</ul>
+<h3 id="快取多久"><a href="#快取多久" class="headerlink" title="快取多久"></a>快取多久</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Cache-Control: max-age&#x3D;31536000</span><br></pre></td></tr></table></figure>
+
+<p>max-age 與 expire 都是決定要快取多久，在時間以內則直接使用快取</p>
+<p>browser 使用快取回應 Status code 200 (from memory cache)</p>
+<p>注意 no-cache 不能和 max-age 一起搭配使用，no-cache 行為上與 max-age=0 相同，等於此資源在使用快取前須去 server 檢查有沒有新版本，<a href="https://stackoverflow.com/questions/1046966/whats-the-difference-between-cache-control-max-age-0-and-no-cache" target="_blank" rel="noopener">不過還是有差</a></p>
+<p>沒有設定 max-age 或 expire 的話</p>
+<ul>
+<li>有設定 Last-Modified: expire = 當前時間+(request date-lastModified) * 10%</li>
+<li>也沒有設定 Last-Modified: 都沒有= =就存不住阿</li>
+</ul>
+<blockquote>
+<p><a href="https://stackoverflow.com/questions/44596937/chrome-memory-cache-vs-disk-cache" target="_blank" rel="noopener">from memory cache vs from disk cache</a></p>
+</blockquote>
+<h3 id="到期後如何判斷是否過期"><a href="#到期後如何判斷是否過期" class="headerlink" title="到期後如何判斷是否過期"></a>到期後如何判斷是否過期</h3><p>當 browser 判斷快取已過期(max-age 時限超過)，則會發 requet 跟 server 要新檔案</p>
+<p>但是要是該檔案根本沒更新，可以繼續使用原來的快取呢?</p>
+<p>這時就會用到 Last-Modified 與 ETag 來判斷檔案的是否更新</p>
+<h4 id="Last-Modified"><a href="#Last-Modified" class="headerlink" title="Last-Modified"></a>Last-Modified</h4><p>當第一次清求資源時，response header 會設定 Last-Modified</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Last-Modified: Fri, 25 Feb 2021 01:47:00 GMT</span><br></pre></td></tr></table></figure>
+<p>當第二次請求該資源，則 request 會帶上 If-Modified-Since</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">If-Modified-Since: Fri, 25 Feb 2021 01:47:00 GMT</span><br></pre></td></tr></table></figure>
+
+<p>如果該時間與 server 中該資源的最後修改時間一致，表示沒有修改過，server 返回 304 Not Modified，若有修改過，則回傳新版本的檔案</p>
+<p>小問題: 檔案如果被打開，但是在沒有修改的情況下存檔，則會更新檔案最後修改時間，這時就要用 etag 判斷</p>
+<h4 id="ETag"><a href="#ETag" class="headerlink" title="ETag"></a>ETag</h4><p>Etag 會根據檔案內容、長度等等資訊計算出 hash 值，不同 server 會有不同計算方法</p>
+<p>在資源回傳給 client 時，response header 會設定 Etag</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Etag: &quot;5d8c72a5edda8d6a:3239&quot;</span><br></pre></td></tr></table></figure>
+<p>下次請求該資源時，request header 會帶上 If-None-Match</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">If-None-Match: &quot;5d8c72a5edda8d6a:3239&quot;</span><br></pre></td></tr></table></figure>
+<p>如果該資源比對後 etag 若一致，則回傳 304，不一致則回傳新版本的檔案</p>
+<p>如果同時設定 Last-Modified 與 ETag，ETag 的優先權更高</p>
+<h3 id="我要最即時的更新-但是我又不想一直問有沒有新版本"><a href="#我要最即時的更新-但是我又不想一直問有沒有新版本" class="headerlink" title="我要最即時的更新! 但是我又不想一直問有沒有新版本"></a>我要最即時的更新! 但是我又不想一直問有沒有新版本</h3><p>以上設定雖然可行，但是有沒有可能 「只要檔案不更新，瀏覽器就不會發 Request，直接沿用快取裡的即可。只要檔案一更新，瀏覽器就要立即抓取新的檔案」(<a href="https://blog.huli.tw/2017/08/27/http-cache/" target="_blank" rel="noopener">by Huli</a>)</p>
+<p>只要將 ETag 實作在檔案上 + max-age 即可做到，通常前端框架 build 完都會幫你加上類似 etag 的副副檔名(那個專有名詞是啥==a)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;script src&#x3D;&#39;script.66666.js&#39;&gt;&lt;&#x2F;script&gt;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Cache-Control: max-age&#x3D;31536000</span><br></pre></td></tr></table></figure>
+
+<h3 id="推薦快取策略"><a href="#推薦快取策略" class="headerlink" title="推薦快取策略"></a>推薦快取策略</h3><p>好圖推薦，不過原圖似乎被撤掉了<br><img src="https://i.imgur.com/EVMx0Wu.png" alt=""><br>（來源：<a href="https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/http-caching?hl=zh-tw）" target="_blank" rel="noopener">https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/http-caching?hl=zh-tw）</a></p>
+<h3 id="參考資料"><a href="#參考資料" class="headerlink" title="參考資料"></a>參考資料</h3><p><a href="https://blog.huli.tw/2017/08/27/http-cache/" target="_blank" rel="noopener">循序漸進理解 HTTP Cache 機制</a></p>
+<p><a href="https://www.cnblogs.com/vajoy/p/5341664.html" target="_blank" rel="noopener">浅谈浏览器http的缓存机制</a></p>
+<p><a href="https://imweb.io/topic/5795dcb6fb312541492eda8c" target="_blank" rel="noopener">HTTP缓存控制小结</a></p>
+<p><a href="https://mp.weixin.qq.com/s/qOMO0LIdA47j3RjhbCWUEQ" target="_blank" rel="noopener">彻底弄懂 Http 缓存机制 - 基于缓存策略三要素分解法</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/cache/" rel="tag"># cache</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/06/24/git-common-use/" rel="prev" title="[實用git系列]git 常用操作以及各個情境">
+      <i class="fa fa-chevron-left"></i> [實用git系列]git 常用操作以及各個情境
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/02/27/js-concept/" rel="next" title="探索 JS 引擎工作原理">
+      探索 JS 引擎工作原理 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#cache-功用"><span class="nav-number">1.</span> <span class="nav-text">cache 功用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#cache-設定"><span class="nav-number">2.</span> <span class="nav-text">cache 設定</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#http-1-0-的快取方式"><span class="nav-number">2.1.</span> <span class="nav-text">http 1.0 的快取方式</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Pragma-禁用快取"><span class="nav-number">2.1.1.</span> <span class="nav-text">Pragma: 禁用快取</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Expires-啟用快取並設定快取時間"><span class="nav-number">2.1.2.</span> <span class="nav-text">Expires: 啟用快取並設定快取時間</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#http-1-1-新增-Cache-Control"><span class="nav-number">2.2.</span> <span class="nav-text">http 1.1 新增 Cache-Control</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#資源是否要快取"><span class="nav-number">2.3.</span> <span class="nav-text">資源是否要快取</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#快取多久"><span class="nav-number">2.4.</span> <span class="nav-text">快取多久</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#到期後如何判斷是否過期"><span class="nav-number">2.5.</span> <span class="nav-text">到期後如何判斷是否過期</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Last-Modified"><span class="nav-number">2.5.1.</span> <span class="nav-text">Last-Modified</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#ETag"><span class="nav-number">2.5.2.</span> <span class="nav-text">ETag</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#我要最即時的更新-但是我又不想一直問有沒有新版本"><span class="nav-number">2.6.</span> <span class="nav-text">我要最即時的更新! 但是我又不想一直問有沒有新版本</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#推薦快取策略"><span class="nav-number">2.7.</span> <span class="nav-text">推薦快取策略</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#參考資料"><span class="nav-number">2.8.</span> <span class="nav-text">參考資料</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Winnie</p>
+  <div class="site-description" itemprop="description">API 調用師</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">16</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Winnie</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 強力驅動 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主題 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.7.0
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID: '4d04e480bbb2fbe2bbd6',
+      clientSecret: '3b14c84be0e27c5f25748fd158c25581c827f1b4',
+      repo: 'op30132.github.io',
+      owner: 'op30132',
+      admin: ['op30132'],
+      id: '3df7cab36a5615dbbccc91cf4d78699d',
+        language: 'zh-TW',
+      distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+</body>
+</html>

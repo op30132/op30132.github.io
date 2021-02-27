@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('https://op30132.github.io').hostname,
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.7.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    comments: {"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: '',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}
+  };
+</script>
+
+  <meta name="description" content="Hexohexo 是快速簡潔的部落格框架，使用 Markdown 語法寫文章，將產生的靜態頁面放在 gitPage，即可快速建置一個免費的部落格">
+<meta property="og:type" content="article">
+<meta property="og:title" content="hexo + git page 建置部落格與常見問題">
+<meta property="og:url" content="https://op30132.github.io/2019/12/23/hexo-gitpage/index.html">
+<meta property="og:site_name" content="Winnie&#39;s blog">
+<meta property="og:description" content="Hexohexo 是快速簡潔的部落格框架，使用 Markdown 語法寫文章，將產生的靜態頁面放在 gitPage，即可快速建置一個免費的部落格">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://i.imgur.com/JXVqhM0.png">
+<meta property="og:image" content="https://i.imgur.com/fb1ATbM.png">
+<meta property="og:image" content="https://i.imgur.com/D5uvZXY.png">
+<meta property="og:image" content="https://i.imgur.com/z82FLfA.png">
+<meta property="og:image" content="https://i.imgur.com/ktScLBj.png">
+<meta property="og:image" content="https://i.imgur.com/DaDazfw.png">
+<meta property="og:image" content="https://i.imgur.com/ZMRbPfJ.png">
+<meta property="og:image" content="https://i.imgur.com/cSkfjMA.png">
+<meta property="og:image" content="https://i.imgur.com/n0kgn0J.png">
+<meta property="article:published_time" content="2019-12-23T21:39:55.000Z">
+<meta property="article:modified_time" content="2021-02-27T05:35:07.632Z">
+<meta property="article:author" content="Winnie">
+<meta property="article:tag" content="Hexo">
+<meta property="article:tag" content="Blog">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.imgur.com/JXVqhM0.png">
+
+<link rel="canonical" href="https://op30132.github.io/2019/12/23/hexo-gitpage/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true
+  };
+</script>
+
+  <title>hexo + git page 建置部落格與常見問題 | Winnie's blog</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-154744757-1"></script>
+    <script>
+      if (CONFIG.hostname === location.hostname) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-154744757-1');
+      }
+    </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Winnie's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首頁</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>關於</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>標籤</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分類</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>歸檔</a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://op30132.github.io/2019/12/23/hexo-gitpage/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Winnie">
+      <meta itemprop="description" content="API 調用師">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Winnie's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          hexo + git page 建置部落格與常見問題
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">發表於</span>
+
+              <time title="創建時間：2019-12-23 21:39:55" itemprop="dateCreated datePublished" datetime="2019-12-23T21:39:55+00:00">2019-12-23</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新於</span>
+                <time title="修改時間：2021-02-27 05:35:07" itemprop="dateModified" datetime="2021-02-27T05:35:07+00:00">2021-02-27</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分類於</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Hexo/" itemprop="url" rel="index">
+                    <span itemprop="name">Hexo</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="Hexo"><a href="#Hexo" class="headerlink" title="Hexo"></a>Hexo</h2><p>hexo 是快速簡潔的部落格框架，使用 Markdown 語法寫文章，將產生的靜態頁面放在 gitPage，即可快速建置一個免費的部落格</p>
+<a id="more"></a>
+<h2 id="前置作業"><a href="#前置作業" class="headerlink" title="前置作業"></a>前置作業</h2><ol>
+<li>安裝 Node.js、git</li>
+<li>安裝 hexo <code>$ npm install -g hexo-cli</code></li>
+</ol>
+<h2 id="建立-Hexo"><a href="#建立-Hexo" class="headerlink" title="建立 Hexo"></a>建立 Hexo</h2><h3 id="1-初始化-Hexo"><a href="#1-初始化-Hexo" class="headerlink" title="1. 初始化 Hexo"></a>1. 初始化 Hexo</h3><p>終端機中 cd 到放專案的資料夾，初始化專案<br><code>$ hexo init projectname</code></p>
+<h3 id="2-進入-Hexo-目錄"><a href="#2-進入-Hexo-目錄" class="headerlink" title="2. 進入 Hexo 目錄"></a>2. 進入 Hexo 目錄</h3><p><code>$ cd projectname</code></p>
+<h3 id="3-安裝-npm-套件"><a href="#3-安裝-npm-套件" class="headerlink" title="3. 安裝 npm 套件"></a>3. 安裝 npm 套件</h3><p>根據專案目錄下的 package.json 安裝相關套件，之後會產生一個 ode_modules 資料夾<br><code>$ npm install</code> </p>
+<h3 id="4-啟動-server"><a href="#4-啟動-server" class="headerlink" title="4. 啟動 server"></a>4. 啟動 server</h3><p>安裝後啟動 server 檢查是否安裝成功<br><code>$ hexo server</code> 或 <code>$ hexo s</code> </p>
+<p>打開瀏覽器，網址欄輸入 <code>http://localhost:4000</code>，若出現如下頁面表示安裝成功</p>
+<p><img src="https://i.imgur.com/JXVqhM0.png" alt=""></p>
+<h3 id="5-安裝主題"><a href="#5-安裝主題" class="headerlink" title="5. 安裝主題"></a>5. 安裝主題</h3><p>由於剛初始化的專案只有 landScape 原主題，若要改成自己喜歡的風格，hexo 提供了多種主題可選 <a href="https://hexo.io/themes/" target="_blank" rel="noopener">https://hexo.io/themes/</a> </p>
+<p>那範例使用非常大眾的 NexT <a href="https://theme-next.iissnan.com/" target="_blank" rel="noopener">https://theme-next.iissnan.com/</a> ，安裝版本為 NexT 7.6.0<br><img src="https://i.imgur.com/fb1ATbM.png" alt=""></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ cd projectname</span><br><span class="line">$ git clone https:&#x2F;&#x2F;github.com&#x2F;theme-next&#x2F;hexo-theme-next themes&#x2F;next</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>注意，中文版本(精于心，简于形) <a href="https://theme-next.iissnan.com/getting-started.html" target="_blank" rel="noopener">https://theme-next.iissnan.com/getting-started.html</a> 只到5.4.0版本<br>最新版本要去官方下載7.6.0的 <a href="https://github.com/theme-next/hexo-theme-next" target="_blank" rel="noopener">https://github.com/theme-next/hexo-theme-next</a></p>
+</blockquote>
+<blockquote>
+<p>中文版本不管在 google analysis、menu設置、和文章寬度都跟官方不同，雷點很多</p>
+</blockquote>
+<h3 id="6-修改配置"><a href="#6-修改配置" class="headerlink" title="6. 修改配置"></a>6. 修改配置</h3><p>目前專案中會有兩個 <code>_config.yml</code> 檔</p>
+<ul>
+<li>一個在根目錄，為網站配置文件</li>
+<li>一個在 themes &gt; next，為主題配置文件</li>
+</ul>
+<p>那修改主題設置的 <code>_config.yml</code> 在根目錄，將原本的 landscape 改成 next，改其他名稱會報 No layout: index.html 錯誤</p>
+<p><img src="https://i.imgur.com/D5uvZXY.png" alt=""></p>
+<p>儲存後重新整理頁面就會改主題摟</p>
+<blockquote>
+<p>配置檔的格式要求很嚴格，注意縮排、空格是否符合，否則配置無法生效</p>
+</blockquote>
+<h3 id="7-Hexo-基礎設置"><a href="#7-Hexo-基礎設置" class="headerlink" title="7. Hexo 基礎設置"></a>7. Hexo 基礎設置</h3><p>想要修改網站標題、個人信息等配置，可在根目錄的 <code>_config.yml</code> 中，打上你想要的網站名稱、副標、作者等</p>
+<p><img src="https://i.imgur.com/z82FLfA.png" alt=""></p>
+<h3 id="8-部屬到-github"><a href="#8-部屬到-github" class="headerlink" title="8. 部屬到 github"></a>8. 部屬到 github</h3><ul>
+<li>新增 Repository</li>
+</ul>
+<p>首先去 github 新增一個 Repository，注意這邊的 repo 名稱要跟 username 一樣，因此要輸入 <code>op30132.github.io</code><br><img src="https://i.imgur.com/ktScLBj.png" alt=""></p>
+<ul>
+<li>安裝 hexo-deployer-git</li>
+</ul>
+<p>接著安裝 Hexo Git 套件，以支持部署 Hexo 靜態頁面到 GitHub</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ npm install hexo-deployer-git --save</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>修改部屬配置</li>
+</ul>
+<p>在根目錄的 <code>_config.yml</code> 中，修改部屬配置</p>
+<p>url是你 github 帳號的頁面，root 用根目錄即可 </p>
+<p><img src="https://i.imgur.com/DaDazfw.png" alt=""></p>
+<p>設定欲部署之 github repo<br><img src="https://i.imgur.com/ZMRbPfJ.png" alt=""></p>
+<p>為什麼 repo 名稱一定要用 <code>username.github.io</code> 呢? </p>
+<p>因為如果你打跟帳號不同的名稱，github 幫你產生的網域名就會變成 <code>https://username.github.io/customName.github.io</code>，root 配置也要修改成 <code>root: /customName.github.io/</code></p>
+<p>如果想自訂名稱，變成 <code>https://customName.github.io</code>，那就得去 GoDaddy、google domain 花錢買網域名</p>
+<ul>
+<li>部屬 GitHub<br>生成靜態檔案，可縮寫成 <code>hexo g</code><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hexo generate</span><br></pre></td></tr></table></figure>
+部屬，可縮寫成 <code>hexo d</code><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hexo deploy</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<p>接著去 Github settings 修改 Source 為 master 就可以了<br><img src="https://i.imgur.com/cSkfjMA.png" alt=""></p>
+<p>等 Github Pages 30秒到1分鐘來更新檔案，就可以到 <code>https://username.github.io</code> 看是否成功</p>
+<h2 id="常見雷區"><a href="#常見雷區" class="headerlink" title="常見雷區"></a>常見雷區</h2><h3 id="1-為什麼佈屬好後卻出現-gitpage-404-頁面"><a href="#1-為什麼佈屬好後卻出現-gitpage-404-頁面" class="headerlink" title="1. 為什麼佈屬好後卻出現 gitpage 404 頁面?"></a>1. 為什麼佈屬好後卻出現 gitpage 404 頁面?</h3><p>可以到 repo 的 Setting 檢查是否輸入錯誤，repo 名稱跟 username 不一樣產生的網址是 <code>https://username.github.io/repo.github.io</code>，而非<code>https://repo.github.io</code><br><img src="https://i.imgur.com/n0kgn0J.png" alt=""></p>
+<h3 id="2-為什麼我的-hexo-部屬好後-CSS-失效"><a href="#2-為什麼我的-hexo-部屬好後-CSS-失效" class="headerlink" title="2. 為什麼我的 hexo 部屬好後 CSS 失效?"></a>2. 為什麼我的 hexo 部屬好後 CSS 失效?</h3><p>這問題不管是用 jekyll 還是 hexo 架站都會發生，原因是當你不是用 <code>username.github.io</code> 作為 repo 名稱時，github會建立在 <code>http://username.github.io/repo</code>，這時就會很容易忘記設置 root 目錄，此時去 <code>_config.yml</code> 修改</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">url: http:&#x2F;&#x2F;username.github.io&#x2F;repo</span><br><span class="line">root: &#x2F;repo&#x2F;</span><br></pre></td></tr></table></figure>
+<p>就會出現 css 了</p>
+<p>本文參考<br><a href="https://hsiangfeng.github.io/hexo/20190411/932826160/" target="_blank" rel="noopener">https://hsiangfeng.github.io/hexo/20190411/932826160/</a><br><a href="https://www.larrynote.com/website-service/6590/" target="_blank" rel="noopener">https://www.larrynote.com/website-service/6590/</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Hexo/" rel="tag"># Hexo</a>
+              <a href="/tags/Blog/" rel="tag"># Blog</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item"></div>
+      <div class="post-nav-item">
+    <a href="/2019/12/24/hexo-tag-page/" rel="next" title="hexo 新增 tag、catagories、about等頁面">
+      hexo 新增 tag、catagories、about等頁面 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Hexo"><span class="nav-number">1.</span> <span class="nav-text">Hexo</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#前置作業"><span class="nav-number">2.</span> <span class="nav-text">前置作業</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#建立-Hexo"><span class="nav-number">3.</span> <span class="nav-text">建立 Hexo</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-初始化-Hexo"><span class="nav-number">3.1.</span> <span class="nav-text">1. 初始化 Hexo</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-進入-Hexo-目錄"><span class="nav-number">3.2.</span> <span class="nav-text">2. 進入 Hexo 目錄</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-安裝-npm-套件"><span class="nav-number">3.3.</span> <span class="nav-text">3. 安裝 npm 套件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-啟動-server"><span class="nav-number">3.4.</span> <span class="nav-text">4. 啟動 server</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-安裝主題"><span class="nav-number">3.5.</span> <span class="nav-text">5. 安裝主題</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-修改配置"><span class="nav-number">3.6.</span> <span class="nav-text">6. 修改配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-Hexo-基礎設置"><span class="nav-number">3.7.</span> <span class="nav-text">7. Hexo 基礎設置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-部屬到-github"><span class="nav-number">3.8.</span> <span class="nav-text">8. 部屬到 github</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#常見雷區"><span class="nav-number">4.</span> <span class="nav-text">常見雷區</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-為什麼佈屬好後卻出現-gitpage-404-頁面"><span class="nav-number">4.1.</span> <span class="nav-text">1. 為什麼佈屬好後卻出現 gitpage 404 頁面?</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-為什麼我的-hexo-部屬好後-CSS-失效"><span class="nav-number">4.2.</span> <span class="nav-text">2. 為什麼我的 hexo 部屬好後 CSS 失效?</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Winnie</p>
+  <div class="site-description" itemprop="description">API 調用師</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">16</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Winnie</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 強力驅動 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主題 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.7.0
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID: '4d04e480bbb2fbe2bbd6',
+      clientSecret: '3b14c84be0e27c5f25748fd158c25581c827f1b4',
+      repo: 'op30132.github.io',
+      owner: 'op30132',
+      admin: ['op30132'],
+      id: '9aa444f3614091e5c6aca9ada3082950',
+        language: 'zh-TW',
+      distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+</body>
+</html>

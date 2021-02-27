@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('https://op30132.github.io').hostname,
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.7.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    comments: {"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: '',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}
+  };
+</script>
+
+  <meta name="description" content="存狀態首先在目前的 branch 終端機輸入">
+<meta property="og:type" content="article">
+<meta property="og:title" content="[實用git系列]改到一半想切去其他 branch 但又不想 commit 怎麼辦?">
+<meta property="og:url" content="https://op30132.github.io/2020/01/09/git-stash/index.html">
+<meta property="og:site_name" content="Winnie&#39;s blog">
+<meta property="og:description" content="存狀態首先在目前的 branch 終端機輸入">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="https://i.imgur.com/2rhI3pM.png">
+<meta property="og:image" content="https://i.imgur.com/0n1kli7.png">
+<meta property="article:published_time" content="2020-01-09T11:21:56.000Z">
+<meta property="article:modified_time" content="2021-02-27T05:35:07.632Z">
+<meta property="article:author" content="Winnie">
+<meta property="article:tag" content="git">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.imgur.com/2rhI3pM.png">
+
+<link rel="canonical" href="https://op30132.github.io/2020/01/09/git-stash/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true
+  };
+</script>
+
+  <title>[實用git系列]改到一半想切去其他 branch 但又不想 commit 怎麼辦? | Winnie's blog</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-154744757-1"></script>
+    <script>
+      if (CONFIG.hostname === location.hostname) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-154744757-1');
+      }
+    </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Winnie's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切換導航欄">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首頁</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>關於</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>標籤</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分類</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>歸檔</a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-TW">
+    <link itemprop="mainEntityOfPage" href="https://op30132.github.io/2020/01/09/git-stash/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Winnie">
+      <meta itemprop="description" content="API 調用師">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Winnie's blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          [實用git系列]改到一半想切去其他 branch 但又不想 commit 怎麼辦?
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">發表於</span>
+
+              <time title="創建時間：2020-01-09 11:21:56" itemprop="dateCreated datePublished" datetime="2020-01-09T11:21:56+00:00">2020-01-09</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新於</span>
+                <time title="修改時間：2021-02-27 05:35:07" itemprop="dateModified" datetime="2021-02-27T05:35:07+00:00">2021-02-27</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分類於</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/git/" itemprop="url" rel="index">
+                    <span itemprop="name">git</span>
+                  </a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="存狀態"><a href="#存狀態" class="headerlink" title="存狀態"></a>存狀態</h2><p>首先在目前的 branch 終端機輸入</p>
+<a id="more"></a>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ git stash</span><br></pre></td></tr></table></figure>
+<p>就會把有 modified 的變更先存起來，這時候 vscode 的 changes file 就會清空</p>
+<p>接著就可以 git checkout &lt;otherBranch&gt;，到其他分支做事了</p>
+<h2 id="拿回狀態"><a href="#拿回狀態" class="headerlink" title="拿回狀態"></a>拿回狀態</h2><p>那切回剛剛的 branch 後，要怎麼拿回剛剛存的狀態呢?</p>
+<h3 id="查看-stash-的狀態"><a href="#查看-stash-的狀態" class="headerlink" title="查看 stash 的狀態"></a>查看 stash 的狀態</h3><p>我們先下 <code>git stash list</code> 看一下剛剛站存的檔案在哪</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ git stash list</span><br><span class="line"></span><br><span class="line">stash@&#123;0&#125;: WIP on group: 2d3d9f8 &lt;commit&gt;</span><br></pre></td></tr></table></figure>
+
+<p>WIP 是 Work In Progress，group 是 branch name</p>
+<p>如果在其他 branch 也進行 stash，<code>git stash list</code> 就會列出各個 branch 的 stash，pop 回來時可選定要拉哪個</p>
+<h3 id="拿回-stash-的狀態"><a href="#拿回-stash-的狀態" class="headerlink" title="拿回 stash 的狀態"></a>拿回 stash 的狀態</h3><p>重點來了，輸入以下指令</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ git stash pop stash@&#123;0&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果後面沒有指定要 pop 哪一個 Stash，會從編號最小的，也就是 stash@{0} 開始拿</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ git stash pop</span><br></pre></td></tr></table></figure>
+
+<p>成功之後，剛剛套用過的 stash@{0} 就會被刪除了</p>
+<h2 id="結論"><a href="#結論" class="headerlink" title="結論"></a>結論</h2><p>stash 應用情境</p>
+<ul>
+<li>切到其他 branch 暫存檔案用</li>
+<li>想從遠端 pull 時，用 git stash 來暫存檔案，否則他會逼你先 commit 才能 pull</li>
+</ul>
+<p>基本上，只要記得 <code>$ git stash</code> 跟 <code>git stash pop</code>，就可以操作最基本的切換了，若要額外使用其他功能，如拿回狀態時不想從 stash list 刪掉，再去翻文章即可</p>
+<h2 id="git-stash-的小衝突"><a href="#git-stash-的小衝突" class="headerlink" title="git stash 的小衝突"></a>git stash 的小衝突</h2><p>這樣的，有一天 git pull後，修改了一些檔案，下班前用 git stash 暫存起來，隔天要 pop 回檔案時卻報錯了</p>
+<p><img src="https://i.imgur.com/2rhI3pM.png" alt=""></p>
+<p>下 git stash list<br><img src="https://i.imgur.com/0n1kli7.png" alt=""></p>
+<p>但是 workspace 明明是空的，看 git 報錯紀錄說是 edit-group.component.ts 這個檔案有衝突，點進去也沒說要改哪==</p>
+<h3 id="解決方式"><a href="#解決方式" class="headerlink" title="解決方式"></a>解決方式</h3><p><a href="https://stackoverflow.com/questions/19937580/cant-pop-git-stash-your-local-changes-to-the-following-files-would-be-overwri" target="_blank" rel="noopener">https://stackoverflow.com/questions/19937580/cant-pop-git-stash-your-local-changes-to-the-following-files-would-be-overwri</a></p>
+<p>最後使用</p>
+<ol>
+<li><p>將 uncommitted changes stage 起來<br><code>git add -u .</code></p>
+</li>
+<li><p>拉回暫存的內容<br><code>git stash pop</code></p>
+</li>
+<li><p>unstage 所有檔案<br><code>git reset</code></p>
+</li>
+</ol>
+<h4 id="參考文章"><a href="#參考文章" class="headerlink" title="參考文章"></a>參考文章</h4><p><a href="https://gitbook.tw/chapters/faq/stash.html" target="_blank" rel="noopener">https://gitbook.tw/chapters/faq/stash.html</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/git/" rel="tag"># git</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/12/28/NewYearChaos/" rel="prev" title="New Year Chaos">
+      <i class="fa fa-chevron-left"></i> New Year Chaos
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/01/15/telnet-error-log/" rel="next" title="win10 telnet 不是內部或外部命令、可執行的程式或批次檔">
+      win10 telnet 不是內部或外部命令、可執行的程式或批次檔 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+    <div class="comments" id="gitalk-container"></div>
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let activeClass = CONFIG.comments.activeClass;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目錄
+        </li>
+        <li class="sidebar-nav-overview">
+          本站概要
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#存狀態"><span class="nav-number">1.</span> <span class="nav-text">存狀態</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#拿回狀態"><span class="nav-number">2.</span> <span class="nav-text">拿回狀態</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#查看-stash-的狀態"><span class="nav-number">2.1.</span> <span class="nav-text">查看 stash 的狀態</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#拿回-stash-的狀態"><span class="nav-number">2.2.</span> <span class="nav-text">拿回 stash 的狀態</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#結論"><span class="nav-number">3.</span> <span class="nav-text">結論</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#git-stash-的小衝突"><span class="nav-number">4.</span> <span class="nav-text">git stash 的小衝突</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#解決方式"><span class="nav-number">4.1.</span> <span class="nav-text">解決方式</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#參考文章"><span class="nav-number">4.1.1.</span> <span class="nav-text">參考文章</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Winnie</p>
+  <div class="site-description" itemprop="description">API 調用師</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">16</span>
+          <span class="site-state-item-name">文章</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-name">分類</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">標籤</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Winnie</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 強力驅動 v4.2.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主題 – <a href="https://pisces.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.7.0
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.css">
+
+<script>
+NexT.utils.loadComments(document.querySelector('#gitalk-container'), () => {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js', () => {
+    var gitalk = new Gitalk({
+      clientID: '4d04e480bbb2fbe2bbd6',
+      clientSecret: '3b14c84be0e27c5f25748fd158c25581c827f1b4',
+      repo: 'op30132.github.io',
+      owner: 'op30132',
+      admin: ['op30132'],
+      id: '965234a5d795e979894dc42c45a1172f',
+        language: 'zh-TW',
+      distractionFreeMode: true
+    });
+    gitalk.render('gitalk-container');
+  }, window.Gitalk);
+});
+</script>
+
+</body>
+</html>
